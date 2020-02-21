@@ -3,7 +3,8 @@ require "logstash/outputs/base"
 require 'redisearch-rb'
 require 'redis'
 require 'json'
-# An redisearch output that does nothing.
+
+# An redisearch output will store data into Redisearch.
 class LogStash::Outputs::Redisearch < LogStash::Outputs::Base
 
   config_name "redisearch"
