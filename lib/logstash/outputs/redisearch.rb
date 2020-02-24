@@ -14,15 +14,13 @@ class LogStash::Outputs::Redisearch < LogStash::Outputs::Base
   config :port, :validate => :number, :default => 6379
   config :key, :validate => :string, :required => true
   config :index, :validate => :string, :default => 'test_index'
+  config :schema, :validate => :array, :default => ['message','TEXT']
   
   public
   def register
     @redis_client = Redis.new(host: @host, port: @port)
     @redis_client.flushdb
     @redisearch_client = RediSearch.new(@index, @redis_client)
-    @schema = [
-      'message', 'TEXT'
-    ]
     @count = 1
     @redisearch_client.create_index(@schema)
     @codec.on_event(&method(:send_to_redisearch))
@@ -33,7 +31,6 @@ class LogStash::Outputs::Redisearch < LogStash::Outputs::Base
   def receive(event)
     begin
       @codec.encode(event)
-
     rescue StandardError => e
       @logger.warn("Error encoding event", :exception => e,
                    :event => event)
