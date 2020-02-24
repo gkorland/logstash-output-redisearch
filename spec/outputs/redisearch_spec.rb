@@ -10,12 +10,11 @@ context "to check if events are inserted to redisearch" do
   subject { described_class.new(config) }
     let(:config) {
     {
-      "key" => "key",
       "index" => "test"
     }
     }
 
-    let(:event_count) { Flores::Random.integer(0..10000) }
+    let(:event_count) { Flores::Random.integer(0..1000) }
     let(:message) { Flores::Random.text(0..100) }
 
     before do

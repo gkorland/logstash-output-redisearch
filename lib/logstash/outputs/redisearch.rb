@@ -12,7 +12,6 @@ class LogStash::Outputs::Redisearch < LogStash::Outputs::Base
   
   config :host, :validate => :string, :default => "127.0.0.1"
   config :port, :validate => :number, :default => 6379
-  config :key, :validate => :string, :required => true
   config :index, :validate => :string, :default => 'test_index'
   config :schema, :validate => :array, :default => ['message','TEXT']
   
@@ -21,7 +20,6 @@ class LogStash::Outputs::Redisearch < LogStash::Outputs::Base
     @redis_client = Redis.new(host: @host, port: @port)
     @redis_client.flushdb
     @redisearch_client = RediSearch.new(@index, @redis_client)
-    @count = 1
     @redisearch_client.create_index(@schema)
     @codec.on_event(&method(:send_to_redisearch))
 
@@ -38,13 +36,11 @@ class LogStash::Outputs::Redisearch < LogStash::Outputs::Base
   end # def event
 
   def send_to_redisearch(event, payload)
-    key = event.sprintf(@key)
     begin
       doc = JSON.parse(payload)
-      id = key+@count.to_s
+      id = rand(2**0..2**63)
       status=@redisearch_client.add_doc(id,doc)
       @logger.info("Inserted Successfully") if status == "OK"
-      @count += 1 
     rescue => e
       @logger.warn("Failed to send event to Redisearch", :event => event,
                    :exception => e,
