@@ -1,15 +1,12 @@
 # encoding: utf-8
 require "logstash/devutils/rspec/spec_helper"
 require "logstash/outputs/redisearch"
-require "logstash/codecs/plain"
-require "logstash/json"
 require "logstash/event"
 require "redisearch-rb"
 require "flores/random"
-require "redis"
 
 describe LogStash::Outputs::Redisearch do
-
+context "to check if events are inserted to redisearch" do
   subject { described_class.new(config) }
     let(:config) {
     {
@@ -30,17 +27,18 @@ describe LogStash::Outputs::Redisearch do
       subject.close
     end
 
+    rs = RediSearch.new("test")
     it "search for a text in redisearch" do
-        rs = RediSearch.new("test")
         info = rs.search("message")
         puts info
         insist { info.count } == 0
       end
      
     it "count number of docs in redisearch are same as number of events" do
-      rs = RediSearch.new("test")
+      # rs = RediSearch.new("test")
       info = rs.info()
       puts info['num_docs']
       insist { info['num_docs'].to_i } == event_count
     end
+  end
 end
