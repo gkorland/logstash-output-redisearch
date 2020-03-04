@@ -1,0 +1,9 @@
+{
+    "index": "logstash-*",
+    "schema": { 
+        "timestamp": "TEXT", 
+        "host" : "TEXT", 
+        "version": "TEXT",
+        "message": "TEXT"
+   }
+}
