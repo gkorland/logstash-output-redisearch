@@ -10,11 +10,12 @@ context "to check if events are inserted to redisearch" do
   subject { described_class.new(config) }
     let(:config) {
     {
-      "index" => "test"
+      # "key" => "key",
+      # "index" => "test"
     }
     }
 
-    let(:event_count) { Flores::Random.integer(0..1000) }
+    let(:event_count) { Flores::Random.integer(0..10000) }
     let(:message) { Flores::Random.text(0..100) }
 
     before do
@@ -25,8 +26,8 @@ context "to check if events are inserted to redisearch" do
       end
       subject.close
     end
-
-    rs = RediSearch.new("test")
+    time = Time.new
+    rs = RediSearch.new("logstash-"+time.strftime("%Y-%m-%d"))
     it "search for a text in redisearch" do
         info = rs.search("message")
         puts info
