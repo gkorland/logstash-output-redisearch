@@ -3,7 +3,7 @@ require "logstash/outputs/template"
 require "logstash/outputs/base"
 require 'redisearch-rb'
 require 'json'
-
+require 'time'
 # An redisearch output will store data into Redisearch.
 class LogStash::Outputs::Redisearch < LogStash::Outputs::Base
 
@@ -41,6 +41,7 @@ class LogStash::Outputs::Redisearch < LogStash::Outputs::Base
   def send_to_redisearch(event, payload)
     begin
       doc = JSON.parse(payload)
+      doc['@timestamp'] = Time.parse(doc['@timestamp']).to_i
       id = rand(2**0..2**63)
       status=@redisearch_client.add_doc(id,doc)
       @logger.info("Event inserted successfully") if status == "OK"
