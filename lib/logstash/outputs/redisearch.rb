@@ -1,4 +1,5 @@
 # encoding: utf-8
+# require "logstash/outputs/template"
 require "logstash/outputs/template"
 require "logstash/outputs/base"
 require 'redisearch-rb'
@@ -12,26 +13,23 @@ class LogStash::Outputs::Redisearch < LogStash::Outputs::Base
 
   config :host, :validate => :string, :default => "127.0.0.1"
   config :port, :validate => :number, :default => 6379
-  config :index, :validate => :string
+  config :index, :validate => :string, :default => nil
 
   public
   def register
-    @template_installed = false
-    @redisearch_client = nil
+    params = {"host"=>@host,"port"=>@port,"index"=>@index}
+    @idx = Index.new(params)
+    @redisearch_client = @idx.default_index()
+    @template_update = false
     @codec.on_event(&method(:send_to_redisearch))
   end # def register
 
   public
   def receive(event)
     begin
-      unless @template_installed
-        data =  event.to_hash
-        params = {"fields"=>data.keys,"host"=>@host,"port"=>@port}
-        @redisearch_client=Index.installTemplate(params)
-        @template_installed = true
-      end
+      event_data = event.to_hash
+      @idx.checkfields(event_data.keys)
       @codec.encode(event)
-     
     rescue StandardError => e
       @logger.warn("Error encoding event", :exception => e,
                    :event => event)

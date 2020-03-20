@@ -10,7 +10,6 @@ context "to check if events are inserted to redisearch" do
   subject { described_class.new(config) }
     let(:config) {
     {
-      # "key" => "key",
       # "index" => "test"
     }
     }
@@ -30,14 +29,11 @@ context "to check if events are inserted to redisearch" do
     rs = RediSearch.new("logstash-"+time.strftime("%Y-%m-%d"))
     it "search for a text in redisearch" do
         info = rs.search("message")
-        puts info
         insist { info.count } == 0
       end
      
     it "count number of docs in redisearch are same as number of events" do
-      # rs = RediSearch.new("test")
       info = rs.info()
-      puts info['num_docs']
       insist { info['num_docs'].to_i } == event_count
     end
   end
