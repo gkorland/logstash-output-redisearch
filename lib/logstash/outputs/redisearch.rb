@@ -20,15 +20,14 @@ class LogStash::Outputs::Redisearch < LogStash::Outputs::Base
     params = {"host"=>@host,"port"=>@port,"index"=>@index}
     @idx = Index.new(params)
     @redisearch_client = @idx.default_index()
-    @template_update = false
     @codec.on_event(&method(:send_to_redisearch))
   end # def register
 
   public
   def receive(event)
     begin
-      event_data = event.to_hash
-      @idx.checkfields(event_data.keys)
+      # event_data = event.to_hash
+      # @idx.checkfields(event_data.keys)
       @codec.encode(event)
     rescue StandardError => e
       @logger.warn("Error encoding event", :exception => e,
