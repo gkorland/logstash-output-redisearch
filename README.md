@@ -1,86 +1,163 @@
-# Logstash Plugin
+# Logstash Output Plugin
 
-This is a plugin for [Logstash](https://github.com/elastic/logstash).
+This logstash output plugin is for Redisearch
 
-It is fully free and fully open source. The license is Apache 2.0, meaning you are pretty much free to use it however you want in whatever way.
+### 1. Plugin Development and Testing
 
-## Documentation
+#### Requirements
+* JRuby (Use Ruby Version Manger(RVM))
+* JDK
+* Git
+* bundler
+* Redisearch
+#### Install requirements
+* RVM
+```bash
+gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
+\curl -sSL https://get.rvm.io | bash
+source ~/.rvm/scripts/rvm
+```
+* JRuby
+```bash
+rvm install jruby
+```
 
-Logstash provides infrastructure to automatically generate documentation for this plugin. We use the asciidoc format to write documentation so any comments in the source code will be first converted into asciidoc and then into html. All plugin documentation are placed under one [central location](http://www.elastic.co/guide/en/logstash/current/).
+* JDK
+```bash
+sudo apt install default-jdk
+echo "export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which javac) )))" >> ~/.profile
+source ~/.profile
+```
 
-- For formatting code or config example, you can use the asciidoc `[source,ruby]` directive
-- For more asciidoc formatting tips, see the excellent reference here https://github.com/elastic/docs#asciidoc-guide
+* bundler
+```bash
+gem install bundler
+```
 
-## Need Help?
-
-Need help? Try #logstash on freenode IRC or the https://discuss.elastic.co/c/logstash discussion forum.
-
-## Developing
-
-### 1. Plugin Developement and Testing
+* Redisearch
+```bash
+git clone --recursive https://github.com/RediSearch/RediSearch.git
+make build
+make run
+```
 
 #### Code
-- To get started, you'll need JRuby with the Bundler gem installed.
-
-- Create a new plugin or clone and existing from the GitHub [logstash-plugins](https://github.com/logstash-plugins) organization. We also provide [example plugins](https://github.com/logstash-plugins?query=example).
+- Clone Project
+```bash
+git clone https://git.hashedin.com/ankita.unhalkar/redisearch-logstash-output-plugin.git 
+``` 
+- Use JRuby
+```bash
+rvm use jruby
+```
 
 - Install dependencies
-```sh
+```bash
 bundle install
 ```
 
 #### Test
 
-- Update your dependencies
-
-```sh
-bundle install
-```
-
 - Run tests
 
-```sh
+```bash
 bundle exec rspec
 ```
 
-### 2. Running your unpublished Plugin in Logstash
+### 2. Running your Plugin in Logstash
 
-#### 2.1 Run in a local Logstash clone
-
-- Edit Logstash `Gemfile` and add the local plugin path, for example:
-```ruby
-gem "logstash-filter-awesome", :path => "/your/local/logstash-filter-awesome"
+* Install Logstash
+```bash
+wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+sudo apt-get install apt-transport-https
+echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list
+sudo apt-get update && sudo apt-get install logstash
+sudo /usr/share/logstash/bin/system-install /etc/logstash/startup.options systemd
 ```
-- Install plugin
-```sh
-bin/logstash-plugin install --no-verify
+
+#### Run in a local Logstash
+
+- Build Gemfile
+
+```bash
+gem build logstash-output-redisearch.gemspec
 ```
-- Run Logstash with your plugin
-```sh
-bin/logstash -e 'filter {awesome {}}'
+
+- Deploy Gemfile to Logstash
+
+```bash
+bin/logstash-plugin install /my/logstash/plugins/logstash-output-redisearch-0.1.0.gem
 ```
-At this point any modifications to the plugin code will be applied to this local Logstash setup. After modifying the plugin, simply rerun Logstash.
 
-#### 2.2 Run in an installed Logstash
-
-You can use the same **2.1** method to run your plugin in an installed Logstash by editing its `Gemfile` and pointing the `:path` to your local plugin development directory or you can build the gem and install it using:
-
-- Build your plugin gem
-```sh
-gem build logstash-filter-awesome.gemspec
+- Verify installed plugin
+```bash
+bin/logstash-plugin list
+There should be logstash-output-redisearch
 ```
-- Install the plugin from the Logstash home
-```sh
-bin/logstash-plugin install /your/local/plugin/logstash-filter-awesome.gem
+#### Start logstash output plugin
+
+- Configuration options
+
+| Name | Description | Type | Required | Default | 
+| --- | --- | --- | --- | --- |
+| host | Redis-server IP address | string | true | "127.0.0.1" | 
+| port | Redis-server port number | number | true | 6379 |
+| index | Name an index in redisearch | string | true | "logstash-current-date" |
+
+* Usage
+```bash
+output {
+    redisearch {
+   }
+}
 ```
-- Start Logstash and proceed to test the plugin
+OR
 
-## Contributing
+```bash
+output {
+    redisearch {
+        host => '192.168.0.1'
+        port => 6379
+        index => logstash
+    }
+}
+```
 
-All contributions are welcome: ideas, patches, documentation, bug reports, complaints, and even something you drew up on a napkin.
+#### Example
+Let us create a logstash pipleline using filebeat as input plugin and redisearch as output plugin:
+1. Install filebeat and configure as following:
+- Install filebeat:
+```bash
+sudo service install filebeat 
+```
+- Enable filebeat input to read from file:
+```bash
+filebeat.inputs:
+	enabled: true
+	paths:
+          -  /path/to/logfile
+```
 
-Programming is not a required skill. Whatever you've seen about open source and maintainers or community members  saying "send patches or die" - you will not see that here.
+- Change filebeat output from elasticsearch to logstash:
+```bash
+output.logstash:
+	hosts: [“localhost:5044”]
+```
 
-It is more important to the community that you are able to contribute.
+2. Create a conf file in /etc/logstash/conf.d
+```bash
+input {
+	beats {
+		Port => 5044
+	}
+output {
+	redisearch {
+}
+}
+```
 
-For more information about contributing, see the [CONTRIBUTING](https://github.com/elastic/logstash/blob/master/CONTRIBUTING.md) file.
+3. After configuring, restart logstash and filebeat services and check the data stashing into redisearch.
+```bash 
+sudo service logstash restart
+sudo service filebeat restart
+```
