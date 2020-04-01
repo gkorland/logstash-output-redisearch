@@ -1,7 +1,7 @@
 {
     "index": "logstash-*",
     "schema": { 
-        "@timestamp": ["NUMERIC", "SORTABLE"],
+        "@timestamp": ["TEXT", "SORTABLE"],
         "host" : "TEXT", 
         "@version": "TEXT",
         "message": "TEXT"
