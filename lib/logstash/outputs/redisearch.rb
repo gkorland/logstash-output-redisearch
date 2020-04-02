@@ -13,25 +13,42 @@ class LogStash::Outputs::Redisearch < LogStash::Outputs::Base
   config_name "redisearch"
   default :codec, "json"
 
+  # Hostname of rediserver to connect to rediserver.
   config :host, :validate => :string, :default => "127.0.0.1"
+  
+  # Port number to connect to rediserver
   config :port, :validate => :number, :default => 6379
+
+  # Index name to create or to connect the existing old spec
   config :index, :validate => :string, :default => nil
+
+  # Interval to reconnect if Failure in redis connection 
   config :reconnect_interval, :validate => :number, :default => 1
+
+  # Max number of events to add in a list 
   config :batch_events, :validate => :number, :default => 10
+
+  # Max interval to pass before flush 
   config :batch_timeout, :validate => :number, :default => 2
 
+  # Method is a constructor to this class. 
+  # Used to intialize buffer, redisearch client and also to create a index if it is not present
   public
   def register
+    
     buffer_initialize(
       :max_items => @batch_events,
       :max_interval => @batch_timeout,
     )
+    
     params = {"host"=>@host,"port"=>@port,"index"=>@index}
     @idx = Index.new(params)
     @redisearch_client = @idx.default_index()
     @codec.on_event(&method(:send_to_redisearch))
+  
   end # def register
 
+  # Method is to receive event and encode it in json format. 
   public
   def receive(event)
     begin
@@ -39,27 +56,34 @@ class LogStash::Outputs::Redisearch < LogStash::Outputs::Base
     rescue StandardError => e
       @logger.warn("Error encoding event", :exception => e,
                    :event => event)
+      sleep @reconnect_interval
+      retry
     end
   end # def event
  
+  # Method is called from Stud::Buffer when max_items/max_interval is reached
   def flush(events, close=false)
     #buffer_flush should pass here the :final boolean value.
     @redisearch_client.add_docs(events)
     @logger.info("Buffer Inserted Successfully", :length => events.length)
   end
 
-  # called from Stud::Buffer#buffer_flush when an error occurs
+  # Method is called from Stud::Buffer when an error occurs
   def on_flush_error(e)
-    @logger.warn("Failed to send backlog of events to Redissearch",
+    @logger.warn("Failed to send backlog of events to Redisearch",
       :exception => e,
       :backtrace => e.backtrace
     )
   end
 
+  # Method is for final bookkeeping and cleanup when plugin thread exit
   def close
+      # Force full flush call to ensure that all accumulated messages are flushed.
       buffer_flush(:final => true)
   end
 
+  # Method to assign uuid to each event (formatting event as per document required by redisearch)
+  # and to append each event to buffer 
   def send_to_redisearch(event, payload)
     begin
       doc_data = JSON.parse(payload)
