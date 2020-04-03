@@ -86,7 +86,7 @@ gem build logstash-output-redisearch.gemspec
 - Deploy Gemfile to Logstash
 
 ```bash
-bin/logstash-plugin install /my/logstash/plugins/logstash-output-redisearch-0.1.0.gem
+bin/logstash-plugin install /path/to/logstash-output-redisearch-0.1.0.gem
 ```
 
 - Verify installed plugin
@@ -98,12 +98,13 @@ There should be logstash-output-redisearch
 
 - Configuration options
 
-| Name | Description | Type | Required | Default | 
+| Name | Description | Type | Default | 
 | --- | --- | --- | --- | --- |
-| host | Redis-server IP address | string | true | "127.0.0.1" | 
-| port | Redis-server port number | number | true | 6379 |
-| index | Name an index in redisearch | string | true | "logstash-current-date" |
-
+| host | Redis-server IP address | string | "127.0.0.1" | 
+| port | Redis-server port number | number | 6379 |
+| index | Name an index in redisearch | string | "logstash-current-date" |
+| batch_events | Max number of events in a buffer before flush | number | 10
+| batch_timeout | Max interval to pass before flush | number | 1
 * Usage
 ```bash
 output {
@@ -119,13 +120,15 @@ output {
         host => '192.168.0.1'
         port => 6379
         index => logstash
+        batch_events => 20
+        batch_timeout => 2
     }
 }
 ```
 
 #### Example
-Let us create a logstash pipleline using filebeat as input plugin and redisearch as output plugin:
-1. Install filebeat and configure as following:
+Let's create a logstash pipleline using filebeat as input plugin and redisearch as output plugin:
+1. Install filebeat and configure /etc/filebeat/filebeat.yml as following:
 - Install filebeat:
 ```bash
 sudo service install filebeat 
@@ -161,3 +164,8 @@ output {
 sudo service logstash restart
 sudo service filebeat restart
 ```
+
+#### References
+
+* https://github.com/logstash-plugins/logstash-output-redis : Redis Output Plugin
+* https://github.com/logstash-plugins/logstash-output-elasticsearch : Elasticsearch Output Plugin
