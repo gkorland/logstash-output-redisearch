@@ -102,7 +102,7 @@ There should be logstash-output-redisearch
 - Configuration options
 
 | Name | Description | Type | Default | 
-| --- | --- | --- | --- | --- |
+| --- | --- | --- | --- |
 | host | Redis-server IP address | string | "127.0.0.1" | 
 | port | Redis-server port number | number | 6379 |
 | index | Name an index in redisearch | string | "logstash-current-date" |
