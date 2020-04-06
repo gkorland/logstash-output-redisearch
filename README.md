@@ -10,6 +10,8 @@ This logstash output plugin is for Redisearch
 * Git
 * bundler
 * Redisearch
+* Logstash
+
 #### Install requirements
 * RVM
 ```bash
@@ -42,6 +44,7 @@ make run
 ```
 
 #### Code
+
 - Clone Project
 ```bash
 git clone https://git.hashedin.com/ankita.unhalkar/redisearch-logstash-output-plugin.git 
@@ -103,8 +106,8 @@ There should be logstash-output-redisearch
 | host | Redis-server IP address | string | "127.0.0.1" | 
 | port | Redis-server port number | number | 6379 |
 | index | Name an index in redisearch | string | "logstash-current-date" |
-| batch_events | Max number of events in a buffer before flush | number | 10
-| batch_timeout | Max interval to pass before flush | number | 1
+| batch_events | Max number of events in a buffer before flush | number | 10 |
+| batch_timeout | Max interval to pass before flush | number | 1 |
 * Usage
 ```bash
 output {
@@ -127,6 +130,7 @@ output {
 ```
 
 #### Example
+
 Let's create a logstash pipleline using filebeat as input plugin and redisearch as output plugin:
 1. Install filebeat and configure /etc/filebeat/filebeat.yml as following:
 - Install filebeat:
