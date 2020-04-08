@@ -38,6 +38,8 @@ This Output plugin will send events to Redisearch
 | <<plugins-{type}s-{plugin}-reconnect_interval>> |<<number,number>>|No
 | <<plugins-{type}s-{plugin}-batch_events>> |<<number,number>>|No
 | <<plugins-{type}s-{plugin}-batch_timeout>> |<<number,number>>|No
+| <<plugins-{type}s-{plugin}-ssl>> |<<boolean,boolean>>|No
+| <<plugins-{type}s-{plugin}-password>> |<<password,password>>|No
 |=======================================================================
 
 [id="plugins-{type}s-{plugin}-host"]
@@ -86,7 +88,23 @@ Max number of events to add in a list
   * Value type is <<number,number>>
   * Default value is `2`
 
- Max interval to pass before flush 
+Max interval to pass before flush 
+
+[id="plugins-{type}s-{plugin}-ssl"]
+===== `ssl` 
+
+  * Value type is <<boolean,boolean>>
+  * Default value is `false`
+
+SSL flag for aunthentication
+
+[id="plugins-{type}s-{plugin}-password"]
+===== `password` 
+
+  * Value type is <<password,password>>
+  * Default value is `None`
+
+Password for aunthentication
 
 // The full list of Value Types is here: 
 // https://www.elastic.co/guide/en/logstash/current/configuration-file-structure.html
