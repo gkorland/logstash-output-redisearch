@@ -31,6 +31,12 @@ class LogStash::Outputs::Redisearch < LogStash::Outputs::Base
   # Max interval to pass before flush 
   config :batch_timeout, :validate => :number, :default => 2
 
+  # SSL flag for aunthentication
+  config :ssl, :validate => :boolean, :default => false
+
+  # Password for aunthentication
+  config :password, :validate => :password
+
   # Method is a constructor to this class. 
   # Used to intialize buffer, redisearch client and also to create a index if it is not present
   public
@@ -41,7 +47,17 @@ class LogStash::Outputs::Redisearch < LogStash::Outputs::Base
       :max_interval => @batch_timeout,
     )
     
-    params = {"host"=>@host,"port"=>@port,"index"=>@index}
+    params = {
+      "host"=>@host,
+      "port"=>@port,
+      "index"=>@index,
+      "ssl"=>@ssl
+    }
+      if @password
+        params = {
+                "password"=>@password.value
+            }
+      end
     @idx = Index.new(params)
     @redisearch_client = @idx.default_index()
     @codec.on_event(&method(:send_to_redisearch))
