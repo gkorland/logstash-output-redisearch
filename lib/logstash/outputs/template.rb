@@ -7,7 +7,12 @@ class Index
     def initialize(params)
         begin
             @rs = nil
-            @redis = Redis.new(host: params["host"], port: params["port"])
+            @redis = Redis.new(
+                host: params["host"], 
+                port: params["port"],
+                ssl: params["ssl"], 
+                password:params["password"])
+                
             filepath = ::File.expand_path('template.json', ::File.dirname(__FILE__))
             template_data = ::IO.read(filepath)
             data = JSON.load(template_data)
@@ -34,28 +39,4 @@ class Index
         return @rs
     end
 
-    def update_index(fields)
-        begin
-            @redis.call('FT.ALTER',@idx,'SCHEMA','ADD', *fields)
-        rescue => e
-            @logger.debug("Something went wrong in index altertion",e)
-        end
-    end
-
-    def checkfields(event_fields)
-       default_fields = []
-       extrafields = {}
-       idx_info=@rs.info()
-       idx_info['fields'].each { |d| default_fields.append(d[0])}
-       event_fields.each { |field|
-            if not default_fields.include? field
-                puts field
-                extrafields[field] = "TEXT"
-            end
-        }
-
-        unless extrafields.empty?
-            update_index(extrafields)
-        end
-    end
 end
