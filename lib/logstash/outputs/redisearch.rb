@@ -7,6 +7,7 @@ require 'securerandom'
 require "stud/buffer"
 require 'json'
 require 'time'
+
 # An redisearch output will store data into Redisearch.
 class LogStash::Outputs::Redisearch < LogStash::Outputs::Base
   include Stud::Buffer
@@ -46,20 +47,20 @@ class LogStash::Outputs::Redisearch < LogStash::Outputs::Base
       :max_items => @batch_events,
       :max_interval => @batch_timeout,
     )
-    
+
     params = {
       "host"=>@host,
       "port"=>@port,
       "index"=>@index,
       "ssl"=>@ssl
     }
-      if @password
-        params = {
-                "password"=>@password.value
-            }
-      end
+    if @password
+      params = {
+              "password"=>@password.value
+          }
+    end
     @idx = Index.new(params)
-    @redisearch_client = @idx.default_index()
+    @redisearch_client = @idx.connect()
     @codec.on_event(&method(:send_to_redisearch))
   
   end # def register

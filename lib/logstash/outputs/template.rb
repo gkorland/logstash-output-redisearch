@@ -3,37 +3,48 @@ require 'redisearch-rb'
 require 'time'
 require 'redis'
 
+# 
 class Index
     def initialize(params)
         begin
             @rs = nil
+            @template_data = read_template()
             @redis = Redis.new(
                 host: params["host"], 
                 port: params["port"],
                 ssl: params["ssl"], 
                 password:params["password"])
-                
-            filepath = ::File.expand_path('template.json', ::File.dirname(__FILE__))
-            template_data = ::IO.read(filepath)
-            data = JSON.load(template_data)
-            @schema = data['schema']
-
+            
             if params["index"] == nil
                 time = Time.new
-                @idx = data['index'].sub! '*', time.strftime("%Y-%m-%d")
-                @rs = RediSearch.new(@idx,@redis)
+                @idx_name = @template_data['index'].sub! '*', time.strftime("%Y-%m-%d")
             else
-                @rs = RediSearch.new(params["index"],@redis)
+                @idx_name = params["index"]
             end
+
+            @rs = RediSearch.new(@idx_name,@redis)
+
         rescue => e
-            @logger.debug("Error in initialization",e)
+            @logger.debug("Exception in Index initialization",e)
         end
     end
 
-    def default_index()
+    def read_template()
+        begin
+            filepath = ::File.expand_path('template.json', ::File.dirname(__FILE__))
+            file_data = ::IO.read(filepath)
+            data = JSON.load(file_data)
+        rescue => e
+            @logger.debug("Exception in reading template", e)
+        end
+        return data
+    end
+
+    def connect()
         begin
             @rs.info()
         rescue
+            @schema = @template_data['schema']
             @rs.create_index(@schema)
         end
         return @rs
