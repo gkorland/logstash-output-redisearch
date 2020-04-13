@@ -14,8 +14,8 @@ context "to check if events are inserted to redisearch" do
     }
     }
 
-    let(:event_count) { Flores::Random.integer(0..10000) }
-    let(:message) { Flores::Random.text(0..100) }
+    let(:event_count) { Flores::Random.integer(0..1000) }
+    let(:message) { Flores::Random.text(0..2) }
 
     before do
       subject.register
