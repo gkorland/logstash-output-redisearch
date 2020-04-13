@@ -106,8 +106,8 @@ There should be logstash-output-redisearch
 | host | Redis-server IP address | string | "127.0.0.1" | 
 | port | Redis-server port number | number | 6379 |
 | index | Name an index in redisearch | string | "logstash-current-date" |
-| batch_events | Max number of events in a buffer before flush | number | 10 |
-| batch_timeout | Max interval to pass before flush | number | 1 |
+| batch_events | Max number of events in a buffer before flush | number | 50 |
+| batch_timeout | Max interval to pass before flush | number | 5 |
 | ssl | SSL authentication | boolean | false |
 | password | Password for authentication | password | - |
 
