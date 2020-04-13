@@ -3,7 +3,6 @@
 require "logstash/outputs/template"
 require "logstash/outputs/base"
 require 'redisearch-rb'
-require 'securerandom'
 require "stud/buffer"
 require 'json'
 require 'time'
@@ -27,10 +26,10 @@ class LogStash::Outputs::Redisearch < LogStash::Outputs::Base
   config :reconnect_interval, :validate => :number, :default => 1
 
   # Max number of events to add in a list 
-  config :batch_events, :validate => :number, :default => 10
+  config :batch_events, :validate => :number, :default => 50
 
   # Max interval to pass before flush 
-  config :batch_timeout, :validate => :number, :default => 2
+  config :batch_timeout, :validate => :number, :default => 5
 
   # SSL flag for aunthentication
   config :ssl, :validate => :boolean, :default => false
@@ -54,11 +53,13 @@ class LogStash::Outputs::Redisearch < LogStash::Outputs::Base
       "index"=>@index,
       "ssl"=>@ssl
     }
+
     if @password
       params = {
               "password"=>@password.value
-          }
+            }
     end
+
     @idx = Index.new(params)
     @redisearch_client = @idx.connect()
     @codec.on_event(&method(:send_to_redisearch))
@@ -104,7 +105,7 @@ class LogStash::Outputs::Redisearch < LogStash::Outputs::Base
   def send_to_redisearch(event, payload)
     begin
       doc_data = JSON.parse(payload)
-      doc_id = SecureRandom.uuid
+      doc_id = @idx.get_id()
       document = [doc_id,doc_data]
       buffer_receive(document)
 
