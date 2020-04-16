@@ -78,7 +78,7 @@ Interval to reconnect if Failure in redis connection
 ===== `batch_events` 
 
   * Value type is <<number,number>>
-  * Default value is `10`
+  * Default value is `50`
 
 Max number of events to add in a list
 
@@ -86,7 +86,7 @@ Max number of events to add in a list
 ===== `batch_timeout` 
 
   * Value type is <<number,number>>
-  * Default value is `2`
+  * Default value is `5`
 
 Max interval to pass before flush 
 
