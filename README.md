@@ -1,6 +1,7 @@
 # Logstash Output Plugin
 
-This logstash output plugin is for Redisearch
+This logstash output plugin is for Redisearch.
+Note: Plugin has not been tested with cluster mode.
 
 ### 1. Plugin Development and Testing
 
@@ -47,7 +48,7 @@ make run
 
 - Clone Project
 ```bash
-git clone https://git.hashedin.com/ankita.unhalkar/redisearch-logstash-output-plugin.git 
+git clone https://github.com/hashedin/logstash-output-redisearch.git
 ``` 
 - Use JRuby
 ```bash
@@ -138,7 +139,7 @@ Let's create a logstash pipleline using filebeat as input plugin and redisearch 
 1. Install filebeat and configure /etc/filebeat/filebeat.yml as following:
 - Install filebeat:
 ```bash
-sudo service install filebeat 
+sudo apt-get install filebeat 
 ```
 - Enable filebeat input to read from file:
 ```bash
