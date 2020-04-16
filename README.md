@@ -129,6 +129,8 @@ output {
         index => logstash
         batch_events => 20
         batch_timeout => 2
+        ssl => true
+        password => "123"
     }
 }
 ```
