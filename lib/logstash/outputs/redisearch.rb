@@ -55,9 +55,7 @@ class LogStash::Outputs::Redisearch < LogStash::Outputs::Base
     }
 
     if @password
-      params = {
-              "password"=>@password.value
-            }
+      params["password"] = @password.value  
     end
 
     @idx = Index.new(params)
