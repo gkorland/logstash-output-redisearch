@@ -56,7 +56,7 @@ Hostname of rediserver to connect to redisearch server
   * Value type is <<number,number>>
   * Default value is `6379`
 
- Port number to connect to rediserver
+Port number to connect to rediserver
 
 [id="plugins-{type}s-{plugin}-index"]
 ===== `index` 
