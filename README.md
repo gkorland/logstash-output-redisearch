@@ -1,7 +1,7 @@
 # Logstash Output Plugin
 
 This logstash output plugin is for Redisearch.
-Note: Plugin has not been tested with cluster mode.
+- Note: Plugin has not been tested with cluster mode.
 
 ### 1. Plugin Development and Testing
 
