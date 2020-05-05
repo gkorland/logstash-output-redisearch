@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.description   = "This gem is a Logstash plugin required to be installed on top of the Logstash core pipeline using $LS_HOME/bin/logstash-plugin install gemname. This gem is not a stand-alone program"
   s.homepage      = 'https://github.com/hashedin/logstash-output-redisearch'
   s.authors       = ['HashedIn Technologies']
-  s.email         = 'contact@hashedin.com'
+  s.email         = 'redis-connectors@hashedin.com'
   s.require_paths = ['lib']
 
   # Files
