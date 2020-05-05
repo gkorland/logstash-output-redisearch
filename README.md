@@ -78,8 +78,16 @@ echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee 
 sudo apt-get update && sudo apt-get install logstash
 sudo /usr/share/logstash/bin/system-install /etc/logstash/startup.options systemd
 ```
+#### Install Plugin
+```bash
+bin/logstash-plugin install logstash-output-redisearch
+```
 
-#### Run in a local Logstash
+#### To run plugin in a local Logstash
+
+```bash
+git clone https://github.com/hashedin/logstash-output-redisearch.git
+``` 
 
 - Build Gemfile
 
