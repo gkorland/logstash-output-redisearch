@@ -85,6 +85,8 @@ bin/logstash-plugin install logstash-output-redisearch
 
 #### To run plugin in a local Logstash
 
+- Clone Project
+
 ```bash
 git clone https://github.com/hashedin/logstash-output-redisearch.git
 ``` 
